@@ -1,283 +1,230 @@
-# 🚗 gantz_transportgi — Transport Job for FiveM
+# 📍 Gantz Teleport — Dynamic Teleport System for FiveM
 
-A fully-featured transport job resource for FiveM (QBox / QBCore / ESX), powered by **ox_lib**, **ox_target**, **oxmysql**, and **community_bridge**. Players pick up passengers, drive them to marked destinations, earn money and XP, and progress through a rank system.
+> **The most flexible and professional teleport solution for your FiveM server.**
+> Create, manage, and use teleport points dynamically — no code editing required.
+
+![FiveM](https://img.shields.io/badge/FiveM-Compatible-green?style=flat-square)
+![QBox](https://img.shields.io/badge/QBox-✔-blue?style=flat-square)
+![QB--Core](https://img.shields.io/badge/QB--Core-✔-blue?style=flat-square)
+![ESX](https://img.shields.io/badge/ESX-✔-blue?style=flat-square)
+![ox_lib](https://img.shields.io/badge/ox__lib-Required-orange?style=flat-square)
+![Version](https://img.shields.io/badge/Version-2.0.0-brightgreen?style=flat-square)
 
 🔗 **[📥 DOWNLOAD FOR FREE HERE TEBEX](https://gantz4-scripts.tebex.io/category/free-1)**  [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/I3I3E12G5)
 
-## 📋 Features
+## ✨ Features
 
-- Immersive NPC at a fixed location — interact via ox_target
-- Random passenger NPCs that enter/exit the vehicle with animations
-- GPS blip + animated arrow marker for each destination
-- Per-trip countdown timer (on-screen, no background box)
-- XP & money rewards saved to MySQL after every trip
-- 7-rank progression system with coloured menu cards
-- Session HUD (top-right) showing live trips and earnings
-- Trip-complete on-screen text with XP/money/rank gained
-- End-of-shift summary menu with **live DB stats**
-- Admin menu (`/admingi`) to create/delete delivery points in-game
-- Full English & Spanish localisation — configurable in one line
-- Compatible with **txAdmin**, **qbx_core**, **QBCore**, **ESX**
+| Feature | Description |
+|---|---|
+| 🌐 **Multi-Language** | Full English & Spanish support with in-game language toggle — preference is saved per player |
+| 🎯 **Dynamic Teleport Points** | Create unlimited teleport points anywhere on the map — no config editing needed |
+| 🔵 **Visual Markers** | Beautiful blue ground markers with floating 3D text labels showing point names |
+| 🚗 **Vehicle Support** | Teleports work seamlessly whether players are on foot or inside a vehicle |
+| ⚙️ **Admin Panel** | Full CRUD management: create, rename, reposition, and delete points from an in-game menu |
+| 🛡️ **Multi-Framework** | Auto-detects and works with **QBox**, **QB-Core**, and **ESX** out of the box |
+| 🔐 **Flexible Permissions** | Supports ACE permissions, txAdmin admin roles, and framework group checks |
+| 💾 **Database Storage** | All data persists in MySQL/MariaDB via oxmysql — survives restarts |
+| ⏱️ **Anti-Spam Cooldown** | Configurable teleport cooldown prevents abuse |
+| 🎨 **OX Lib Menus** | Clean, modern UI powered by ox_lib context menus |
+| 🔊 **Sound Effects** | Optional teleport sound for immersive feedback |
+| 📱 **Screen Effects** | Smooth fade-in/fade-out transition when teleporting |
+| ☕ **Donate Button** | Built-in Ko-fi support link in the menu |
 
 ---
 
-## ⚙️ Requirements
+## 📸 How It Works
 
-| Resource | Version | Notes |
+### For Players
+1. **Walk into a blue marker** on the ground — you'll see the point name floating above it
+2. A **help notification** appears: *"Press E for Teleport Menu"*
+3. Press **E** to open the teleport menu
+4. **Select a destination** from the list — you'll be teleported instantly with a smooth transition
+5. If you're in a **vehicle**, it teleports with you
+6. Use the **🌐 Language button** at the top to switch between English and Spanish
+
+### For Administrators
+1. Use the command **`/crearteleport`** or press **E** on any marker and select **⚙️ Administration**
+2. **Create New Point**: Stand where you want the teleport and click create — enter a name and it's done
+3. **Edit Existing Points**: View all points with coordinates, then:
+   - 📍 **Update Position** — moves the point to your current location
+   - ✏️ **Rename** — change the display name
+   - 🗑️ **Delete** — permanently remove with confirmation dialog
+
+---
+
+## 📋 Requirements
+
+| Dependency | Version | Link |
 |---|---|---|
-| [ox_lib](https://github.com/overextended/ox_lib) | ≥ 3.x | Context menus, callbacks, progress bars, notifications |
-| [ox_target](https://github.com/overextended/ox_target) | ≥ 3.x | NPC interaction |
-| [oxmysql](https://github.com/overextended/oxmysql) | ≥ 2.x | Database persistence |
-| [community_bridge](https://github.com/The-Order-Of-The-Sacred-Framework/community_bridge) | ≥ 0.13 | Framework detection, money, admin check |
+| **FiveM Server** | Latest recommended | [fivem.net](https://fivem.net) |
+| **ox_lib** | v3.0.0+ | [GitHub](https://github.com/overextended/ox_lib) |
+| **oxmysql** | v2.0.0+ | [GitHub](https://github.com/overextended/oxmysql) |
+| **Framework** | QBox, QB-Core, or ESX | Any of the three |
 
 ---
 
-## 🗄️ Database
+## 🚀 Installation
 
-The resource **automatically creates** the required table on every server start:
-
-```sql
-CREATE TABLE IF NOT EXISTS `gantz_transportgi_stats` (
-    `identifier` varchar(60) NOT NULL,
-    `xp`         int(11)     NOT NULL DEFAULT 0,
-    `trips`      int(11)     NOT NULL DEFAULT 0,
-    `earnings`   int(11)     NOT NULL DEFAULT 0,
-    PRIMARY KEY (`identifier`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+### Step 1 — Download & Place
+```
+Place the `gantz_teleport` folder into your server's resources directory:
+resources/[your_scripts]/gantz_teleport/
 ```
 
-> **Important:** If you created the table manually **without** a `PRIMARY KEY` on `identifier`, XP will not accumulate correctly. Drop and recreate it, or run:
-> ```sql
-> ALTER TABLE gantz_transportgi_stats ADD PRIMARY KEY (identifier);
-> ```
+### Step 2 — Add to server.cfg
+```cfg
+# Make sure dependencies load first
+ensure ox_lib
+ensure oxmysql
 
----
+# Then load gantz_teleport
+ensure gantz_teleport
 
-## 📦 Installation
-
-1. Copy the `gantz_transportgi` folder into your `resources` directory.
-2. Add to `server.cfg`:
-   ```
-   ensure gantz_transportgi
-   ```
-3. Make sure all dependencies are started **before** this resource.
-4. The database table is created automatically on first start — no SQL import needed.
-
----
-
-## ⚙️ Configuration (`config.lua`)
-
-### Language
-
-```lua
-Config.Lang = 'en'   -- 'en' (English) or 'es' (Spanish)
+# Grant admin permissions (recommended)
+add_ace group.admin gantz_teleport.admin allow
 ```
 
-Default is English. All UI text, notifications, and menus switch instantly.
+### Step 3 — Restart Server
+The database table `gantz_teleports` will be created automatically on first start.
+
+### Step 4 — Create Your First Teleport
+1. Join the server as an admin
+2. Go to the location where you want a teleport point
+3. Type `/crearteleport` in chat
+4. Click **➕ Create New Point**
+5. Enter a name — done! A blue marker appears at your position
 
 ---
 
-### Main NPC
+## ⚙️ Configuration
+
+All settings are in **`config.lua`** — fully commented and easy to customize:
 
 ```lua
-Config.MainNPC = {
-    model  = 'a_m_y_business_02',
-    coords = vector4(1388.4625, -747.1477, 67.1903, 74.3599)
-    --                 X          Y          Z        Heading
+-- Default language ('en' or 'es')
+Config.DefaultLanguage = 'es'
+
+-- Marker appearance
+Config.MarkerRadius = 2.0          -- Detection radius
+Config.MarkerColor = { r=0, g=100, b=255, a=180 }  -- Blue RGBA
+Config.MarkerScale = vector3(2.0, 2.0, 0.5)
+
+-- Teleport cooldown (seconds)
+Config.TeleportCooldown = 3
+
+-- Admin permissions (any match = admin access)
+Config.AdminAcePermissions = {
+    'gantz_teleport.admin',  -- Custom ACE
+    'command',               -- txAdmin default
 }
+
+-- Sound effects
+Config.TeleportSound = true
+
+-- Donate URL
+Config.DonateURL = 'https://ko-fi.com/gantz4'
 ```
-
-The NPC is local-only (not networked), automatically ground-snapped, and frozen in place. Change `model` to any valid GTA5 ped model name. Change `coords` to wherever you want the NPC to stand.
-
----
-
-### Vehicle
-
-```lua
-Config.Vehicle = {
-    model  = 'baller',
-    spawn  = vector4(1387.2421, -740.3605, 66.7123, 0.1694),
-    jobTag = 'taxi'   -- used by vehicle key systems
-}
-```
-
-`model` — any valid GTA5 vehicle model name.  
-`spawn` — position and heading where the car spawns when the shift starts.  
-`jobTag` — job name passed to vehiclelock/key systems (if used).
-
----
-
-### Passenger NPCs
-
-```lua
-Config.Girls = {
-    'a_f_y_topless_01',
-    's_f_y_stripper_01',
-    's_f_y_stripper_02',
-    'a_f_y_juggalo_01'
-}
-```
-
-Between 1 and 3 passengers spawn randomly per trip. Add or remove any GTA5 ped model names from this list.
-
----
-
-### Rewards
-
-```lua
-Config.Rewards = {
-    minMoney  = 500,    -- minimum cash per completed trip
-    maxMoney  = 1500,   -- maximum cash per completed trip
-    xpPerTrip = 100     -- XP earned per completed trip (fixed)
-}
-```
-
-Cash is awarded randomly between `minMoney` and `maxMoney`. XP is always the fixed `xpPerTrip` value.
-
----
-
-### Wait Time
-
-```lua
-Config.WaitTime = {
-    min = 1,   -- minimum client wait time (minutes)
-    max = 2    -- maximum client wait time (minutes)
-}
-```
-
-After passengers exit the vehicle at the destination, a random countdown timer runs before they re-board. This simulates time with the client.
-
----
-
-### Rank System
-
-```lua
-Config.Ranks = {
-    { min = 0,     name = 'Novice',       icon = '🔘', color = '#aaaaaa' },
-    { min = 500,   name = 'Driver',       icon = '🚗', color = '#44aaff' },
-    { min = 1500,  name = 'Professional', icon = '⭐', color = '#44ff88' },
-    { min = 3500,  name = 'Expert',       icon = '🌟', color = '#ffcc00' },
-    { min = 7000,  name = 'Veteran',      icon = '💎', color = '#ff8800' },
-    { min = 15000, name = 'Elite',        icon = '🏆', color = '#ff4444' },
-    { min = 30000, name = 'Legend',       icon = '👑', color = '#cc44ff' },
-}
-```
-
-Each rank requires `min` total XP. The player's current rank and next-rank progress are shown in the job menu and the end-of-shift summary.
-
-- `min` — minimum accumulated XP to reach this rank (must start at `0` for the first entry)
-- `name` — display name (shown in menu and trip-complete text)
-- `icon` — emoji shown in the menu card title
-- `color` — hex color used for the menu card accent (any CSS hex color)
-
-You can add, remove, or reorder ranks freely. Always keep at least one entry with `min = 0`.
-
----
-
-## 📍 Adding & Managing Delivery Points
-
-Delivery points are saved to `locations.json` in the resource folder.
-
-### In-game (recommended)
-
-1. Grant yourself the permission (see [Admin Permissions](#-admin-permissions)).
-2. Drive or walk to the location you want as a new delivery point.
-3. Type `/admingi` in chat.
-4. Select **Create new delivery point** — your current ground position is saved automatically with Z ground-snapped.
-5. To remove a point, select **Delete delivery point** and choose from the list (coordinates shown in metadata).
-
-### Manually (editing `locations.json`)
-
-```json
-[
-  { "x": 1385.77, "y": -747.84, "z": 67.18 },
-  { "x": -1200.0, "y": 300.0,   "z": 69.5  }
-]
-```
-
-Add objects with `x`, `y`, `z` coordinates. The resource reloads the file each time it reads locations — no server restart required after saving this file while the resource is running.
-
-> **Tip:** Use `/admingi` in-game for accurate ground Z values. Manual edits may cause markers to float if Z is wrong.
 
 ---
 
 ## 🔐 Admin Permissions
 
-`/admingi` is accessible to any of the following:
+The script checks for admin access in this order:
 
-| System | Ace / Method |
-|---|---|
-| txAdmin (any admin) | ace `command` |
-| txAdmin group admin | ace `group.admin` |
-| txAdmin group mod | ace `group.mod` |
-| Custom ace | ace `gantz_transportgi.admin` |
-| QBox / QB framework admin | `community_bridge:Framework().GetIsFrameworkAdmin` |
-| Server console | always allowed |
-
-To grant a non-txAdmin player access via custom ace, add to `server.cfg`:
-
-```
-add_ace identifier.license:XXXXXXXX gantz_transportgi.admin allow
-```
-
----
-
-## 🌐 Localisation
-
-All user-facing strings are defined in `config.lua` under `Config.Locales`. Two languages are included by default: `en` and `es`.
-
-To change language:
-```lua
-Config.Lang = 'en'   -- or 'es'
-```
-
-To add a new language, copy the `en` block, rename the key (e.g. `'fr'`), translate all strings, and set `Config.Lang = 'fr'`.
-
-```lua
-Config.Locales.fr = {
-    target_label = "Gestion du Transport",
-    menu_title   = "Gantz Transport",
-    start_job    = "Commencer le travail",
-    -- ... all other keys
-}
-```
-
----
-
-## 📝 Commands
-
-| Command | Permission | Description |
+| Priority | Method | Details |
 |---|---|---|
-| `/admingi` | Admin only | Opens the admin menu to create or delete delivery points |
+| 1️⃣ | **ACE Permissions** | Checks all entries in `Config.AdminAcePermissions` — includes txAdmin's `command` ACE |
+| 2️⃣ | **QBox Group** | Checks `PlayerData.group` via `qbx_core` export |
+| 3️⃣ | **QB-Core Group** | Checks `PlayerData.group` via `qb-core` export |
+| 4️⃣ | **ESX Group** | Checks `xPlayer.getGroup()` via `es_extended` |
+
+Accepted groups: `admin`, `superadmin`, `god`
+
+> **txAdmin users**: If you have admin in txAdmin, the `command` ACE is usually granted automatically — the script will detect it.
 
 ---
 
-## 🎮 Player Flow
+## 🌐 Language System
 
-1. Find the NPC (purple blip on map — "Gantz Transport")
-2. Interact via ox_target → menu opens with your rank card and stats
-3. Click **Start Job** — a vehicle spawns, passengers board automatically
-4. Follow the GPS blip to the destination (yellow arrow marker on ground)
-5. Wait for the countdown timer, then passengers re-board
-6. Trip completes — XP and money awarded, on-screen summary shown
-7. Repeat until you click **Finish Job** — end-of-shift summary opens with live DB stats
+- Players can switch between **English** and **Spanish** via the 🌐 button in the menu
+- Language preference is **saved per player** using FiveM's KVP system (persists across sessions)
+- Default language is configurable in `config.lua`
+- All UI text, notifications, and dialogs are fully translated
 
 ---
 
-## 🏗️ Resource Structure
+## 📁 File Structure
 
 ```
-gantz_transportgi/
-├── fxmanifest.lua      Resource manifest
-├── config.lua          All configuration (NPC, vehicle, rewards, ranks, locales)
-├── client.lua          Client-side logic (NPC, menus, mission loop, render thread)
-├── server.lua          Server-side logic (rewards, DB, admin commands, permissions)
-├── locations.json      Saved delivery point coordinates
-└── README.md           This file
+gantz_teleport/
+├── fxmanifest.lua    # Resource manifest & dependencies
+├── config.lua        # All settings, markers, permissions & translations
+├── client.lua        # Markers, menus, teleport effects, language toggle
+├── server.lua        # Database, admin checks, CRUD events, framework detection
+└── README.md         # This file
 ```
 
 ---
 
+## 🗄️ Database
+
+The script automatically creates the following table:
+
+```sql
+CREATE TABLE gantz_teleports (
+    id       INTEGER PRIMARY KEY AUTO_INCREMENT,
+    name     VARCHAR(100) NOT NULL,
+    pos_x    FLOAT NOT NULL,
+    pos_y    FLOAT NOT NULL,
+    pos_z    FLOAT NOT NULL,
+    heading  FLOAT NOT NULL DEFAULT 0.0
+);
+```
+
+---
+
+## 🔧 Commands
+
+| Command | Access | Description |
+|---|---|---|
+| `ES - /crearteleport US - /createteleport` | Admin only | Opens the admin management menu |
+
+---
+
+## ❓ FAQ
+
+**Q: Does it work with QBox?**
+A: Yes. The script auto-detects QBox (`qbx_core`) and uses its native API, with a fallback to the QB-Core bridge.
+
+**Q: I'm admin in txAdmin but get "no permissions"**
+A: Make sure `'command'` is listed in `Config.AdminAcePermissions` (it is by default). If using a custom setup, add `add_ace group.admin gantz_teleport.admin allow` to your `server.cfg`.
+
+**Q: Can players create teleport points?**
+A: No. Only admins can create, edit, and delete points. Players can only use existing destinations.
+
+**Q: Does it teleport vehicles?**
+A: Yes. If a player is inside a vehicle when they teleport, the entire vehicle (and player) moves to the destination.
+
+**Q: Where is the data stored?**
+A: In your MySQL/MariaDB database in the `gantz_teleports` table via oxmysql.
+
+**Q: Can I add more languages?**
+A: Yes! Add a new entry in `Config.Locales` in `config.lua` (e.g., `['fr']` for French) and update the toggle logic in `client.lua`.
+
+---
+
+## ☕ Support the Developer
+
+If you enjoy this resource, consider supporting development:
+
+**[☕ Buy me a coffee on Ko-fi](https://ko-fi.com/gantz4)**
+
+---
+
+## 📄 License
+
+This resource is sold as-is. Redistribution or resale is prohibited.
+© 2026 Gantz — All rights reserved.
 ## 📜 License
 
 This resource is released for personal and server use. Redistribution or resale is not permitted without explicit permission from the author.
