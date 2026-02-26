@@ -2,7 +2,7 @@
 
 A fully-featured transport job resource for FiveM (QBox / QBCore / ESX), powered by **ox_lib**, **ox_target**, **oxmysql**, and **community_bridge**. Players pick up passengers, drive them to marked destinations, earn money and XP, and progress through a rank system.
 
----
+🔗 **[📥 DOWNLOAD FOR FREE HERE TEBEX](https://gantz4-scripts.tebex.io/category/free-1)**  [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/I3I3E12G5)
 
 ## 📋 Features
 
